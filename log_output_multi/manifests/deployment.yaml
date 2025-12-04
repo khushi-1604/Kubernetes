@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-output-multi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-output-multi
+  template:
+    metadata:
+      labels:
+        app: log-output-multi
+    spec:
+      containers:
+        - name: generator
+          image: your-dockerhub-username/log-output-generator:1.10
+          volumeMounts:
+            - name: log-data
+              mountPath: /data
+        - name: reader
+          image: your-dockerhub-username/log-output-reader:1.10
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: log-data
+              mountPath: /data
+      volumes:
+        - name: log-data
+          emptyDir: {}
