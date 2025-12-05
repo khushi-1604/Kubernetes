@@ -1,0 +1,63 @@
+name: Deploy to GKE (Branch environments)
+
+on:
+  push:
+    branches:
+      - "*"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker auth
+        run: gcloud auth configure-docker
+
+      - name: Build image
+        run: |
+          IMAGE=gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-app:${{ github.sha }}
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+          docker build -t $IMAGE .
+
+      - name: Push image
+        run: docker push ${{ env.IMAGE }}
+
+      - name: Get GKE credentials
+        run: |
+          gcloud container clusters get-credentials \
+            ${{ secrets.GKE_CLUSTER_NAME }} \
+            --region ${{ secrets.GKE_REGION }}
+
+      - name: Determine namespace based on branch
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            echo "NAMESPACE=project" >> $GITHUB_ENV
+          else
+            echo "NAMESPACE=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          fi
+
+      - name: Create namespace if not exists
+        run: |
+          kubectl get namespace ${{ env.NAMESPACE }} || \
+          kubectl create namespace ${{ env.NAMESPACE }}
+
+      - name: Deploy with Kustomize
+        run: |
+          cd manifests/overlays/production
+          
+          # Inject namespace into kustomization
+          kustomize edit set namespace ${{ env.NAMESPACE }}
+
+          # Update image
+          kustomize edit set image gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-app:${{ github.sha }}
+
+          kubectl apply -k .
