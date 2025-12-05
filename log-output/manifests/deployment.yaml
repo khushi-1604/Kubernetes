@@ -1,34 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: logoutput-deployment
-  namespace: exercises
+  name: project-app
+  namespace: project
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: logoutput
+      app: project-app
   template:
     metadata:
       labels:
-        app: logoutput
+        app: project-app
     spec:
       containers:
-        - name: logoutput-container
-          image: YOUR_IMAGE_HERE
-          env:
-            - name: MESSAGE
-              valueFrom:
-                configMapKeyRef:
-                  name: logoutput-config
-                  key: MESSAGE
-          volumeMounts:
-            - name: info-volume
-              mountPath: /etc/config
-      volumes:
-        - name: info-volume
-          configMap:
-            name: logoutput-config
-            items:
-              - key: information.txt
-                path: information.txt
+      - name: project-container
+        image: YOUR_PROJECT_IMAGE
+        ports:
+        - containerPort: 3000
+        env:
+          - name: PORT
+            value: "3000"  # can also pass as env variable in cluster
+          - name: BACKEND_URL
+            valueFrom:
+              configMapKeyRef:
+                name: project-config
+                key: BACKEND_URL
+          - name: WELCOME_MESSAGE
+            valueFrom:
+              configMapKeyRef:
+                name: project-config
+                key: WELCOME_MESSAGE
