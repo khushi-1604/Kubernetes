@@ -1,17 +1,11 @@
-metadata:
-  name: pingpong
-  namespace: exercises
-
 apiVersion: v1
 kind: Service
 metadata:
-  name: pingpong-svc
-  namespace: project
-
+  name: pingpong
 spec:
+  type: LoadBalancer
   selector:
     app: pingpong
   ports:
-    - protocol: TCP
-      port: 3001
-      targetPort: 3001
+    - port: 80
+      targetPort: 3000

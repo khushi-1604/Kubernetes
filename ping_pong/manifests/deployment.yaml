@@ -13,7 +13,11 @@ spec:
         app: pingpong
     spec:
       containers:
-      - name: pingpong
-        image: khushi/pingpong:latest
-        ports:
-        - containerPort: 3001
+        - name: pingpong
+          image: gcr.io/<PROJECT-ID>/pingpong:latest
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secret
+                  key: url
