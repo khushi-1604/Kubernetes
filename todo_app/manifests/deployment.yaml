@@ -1,22 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-app
+  name: todo-backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: todo-app
+      app: todo-backend
   template:
     metadata:
       labels:
-        app: todo-app
+        app: todo-backend
     spec:
       containers:
-        - name: todo-app
-          image: khushi03/todo-app:1.5
-          ports:
-            - containerPort: 3000
-          env:
-            - name: PORT
-              value: "3000"
+      - name: todo-backend
+        image: khushi/todo-backend:latest
+        ports:
+        - containerPort: 3002
