@@ -17,3 +17,10 @@ spec:
         image: khushi/todo-backend:latest
         ports:
         - containerPort: 3002
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: 3000
+  initialDelaySeconds: 2
+  periodSeconds: 5
+  failureThreshold: 3
