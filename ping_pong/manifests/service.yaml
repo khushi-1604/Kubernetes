@@ -8,3 +8,9 @@ spec:
   ports:
     - port: 80
       targetPort: 3000
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: 3000
+  initialDelaySeconds: 2
+  periodSeconds: 5
