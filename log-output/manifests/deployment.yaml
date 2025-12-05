@@ -1,23 +1,34 @@
-metadata:
-  name: log-output
-  namespace: exercises
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: log-output
+  name: logoutput-deployment
+  namespace: exercises
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: log-output
+      app: logoutput
   template:
     metadata:
       labels:
-        app: log-output
+        app: logoutput
     spec:
       containers:
-      - name: log-output
-        image: khushi/log-output:latest
-        ports:
-        - containerPort: 3000
+        - name: logoutput-container
+          image: YOUR_IMAGE_HERE
+          env:
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: logoutput-config
+                  key: MESSAGE
+          volumeMounts:
+            - name: info-volume
+              mountPath: /etc/config
+      volumes:
+        - name: info-volume
+          configMap:
+            name: logoutput-config
+            items:
+              - key: information.txt
+                path: information.txt
