@@ -1,0 +1,33 @@
+name: Delete Environment on Branch Delete
+
+on:
+  delete:
+    branches:
+      - "*"
+
+jobs:
+  delete-env:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Display deleted branch
+        run: echo "Deleted branch = ${{ github.event.ref }}"
+
+      - name: Extract namespace from deleted branch
+        id: ns
+        run: |
+          BRANCH="${{ github.event.ref }}"
+          # remove refs/heads/
+          BRANCH_NAME=${BRANCH#refs/heads/}
+
+          # main branch uses namespace 'project', which we do NOT delete
+          if [ "$BRANCH_NAME" = "main" ]; then
+            echo "Namespace 'project' will NOT be deleted."
+            echo "skip=true" >> $GITHUB_ENV
+          else
+            echo "NAMESPACE=$BRANCH_NAME" >> $GITHUB_ENV
+            echo "skip=false" >> $GITHUB_ENV
+          fi
+
+      - name: Setup gcloud
+        if: env.skip ==
