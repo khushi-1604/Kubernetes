@@ -1,36 +1,20 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const app = express();
+app.put('/todos/:id', async (req, res) => {
+  const id = req.params.id;
+  const { done } = req.body;
 
-let todos = [
-  { id: 1, text: "Sample todo 1" },
-  { id: 2, text: "Sample todo 2" }
-];
+  try {
+    const result = await pool.query(
+      'UPDATE todos SET done=$1 WHERE id=$2 RETURNING *',
+      [done, id]
+    );
 
-app.use(bodyParser.json());
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Todo not found' });
+    }
 
-app.get('/todos', (req, res) => {
-  res.json(todos);
-});
-
-app.post('/todos', (req, res) => {
-  const text = req.body.text;
-
-  if (!text || text.length > 140) {
-    return res.status(400).json({ error: "Todo must be 1–140 characters" });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database update failed' });
   }
-
-  const todo = {
-    id: todos.length + 1,
-    text
-  };
-
-  todos.push(todo);
-
-  res.json(todo);
-});
-
-const PORT = process.env.PORT || 3002;
-app.listen(PORT, () => {
-  console.log(`Todo backend running on port ${PORT}`);
 });
