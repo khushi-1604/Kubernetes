@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo App</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+    input { width: 100%; padding: 10px; margin-bottom: 10px; }
+    button { padding: 10px 15px; cursor: pointer; }
+    ul { margin-top: 20px; padding-left: 20px; }
+  </style>
+</head>
+<body>
+
+  <h2>Todo App</h2>
+
+  <!-- Input field with 140 char limit -->
+  <input 
+    type="text" 
+    id="todoInput" 
+    maxlength="140" 
+    placeholder="Write a todo (max 140 chars)"
+  >
+
+  <!-- Send button (no functionality yet) -->
+  <button id="sendBtn">Send</button>
+
+  <h3>Existing Todos</h3>
+  <ul>
+    <li>Learn Kubernetes</li>
+    <li>Finish todo app</li>
+    <li>Drink water 💧</li>
+  </ul>
+
+</body>
+</html>
