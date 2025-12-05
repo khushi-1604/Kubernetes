@@ -1,17 +1,25 @@
-const express = require("express");
-const fs = require("fs");
+const axios = require('axios');
+const express = require('express');
 const app = express();
 
-const pingPath = "/data/counter.txt";
-const random = require("crypto").randomUUID();
+const randomString = Math.random().toString(36).substr(2, 10);
 
-app.get("/status", (req, res) => {
-  let count = 0;
+app.get('/status', async (req, res) => {
+  const timestamp = new Date().toISOString();
+
+  let pingCount = "unknown";
+
   try {
-    count = parseInt(fs.readFileSync(pingPath, "utf8")) || 0;
-  } catch {}
+    const resp = await axios.get('http://pingpong-svc:3001/pingpong');
+    pingCount = resp.data;
+  } catch (err) {
+    pingCount = "error connecting to ping-pong";
+  }
 
-  res.send(`${new Date().toISOString()}: ${random}\nPing / Pongs: ${count}`);
+  res.send(`${timestamp}: ${randomString}<br>Ping/Pong: ${pingCount}`);
 });
 
-app.listen(3001, () => console.log("Reader running"));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Log-output running on port ${PORT}`);
+});

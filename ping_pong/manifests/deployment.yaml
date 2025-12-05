@@ -1,29 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ping-pong
+  name: pingpong
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ping-pong
+      app: pingpong
   template:
     metadata:
       labels:
-        app: ping-pong
+        app: pingpong
     spec:
       containers:
-        - name: ping-pong
-          image: khushi03/ping-pong:latest
-          ports:
-            - containerPort: 3000
-          env:
-            - name: PORT
-              value: "3000"
-volumeMounts:
-  - name: shared
-    mountPath: /data
-volumes:
-  - name: shared
-    persistentVolumeClaim:
-      claimName: shared-pvc
+      - name: pingpong
+        image: khushi/pingpong:latest
+        ports:
+        - containerPort: 3001
