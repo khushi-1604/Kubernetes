@@ -1,22 +1,17 @@
 const express = require("express");
+const fs = require("fs");
 const app = express();
-const { v4: uuidv4 } = require("uuid");
 
-const randomString = uuidv4();
+const pingPath = "/data/counter.txt";
+const random = require("crypto").randomUUID();
 
 app.get("/status", (req, res) => {
-  res.json({
-    timestamp: new Date().toISOString(),
-    randomString: randomString
-  });
+  let count = 0;
+  try {
+    count = parseInt(fs.readFileSync(pingPath, "utf8")) || 0;
+  } catch {}
+
+  res.send(`${new Date().toISOString()}: ${random}\nPing / Pongs: ${count}`);
 });
 
-// Keep previous logging every 5 seconds (if still needed)
-setInterval(() => {
-  console.log(`${new Date().toISOString()}: ${randomString}`);
-}, 5000);
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server started in port ${PORT}`);
-});
+app.listen(3001, () => console.log("Reader running"));

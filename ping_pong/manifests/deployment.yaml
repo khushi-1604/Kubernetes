@@ -20,3 +20,10 @@ spec:
           env:
             - name: PORT
               value: "3000"
+volumeMounts:
+  - name: shared
+    mountPath: /data
+volumes:
+  - name: shared
+    persistentVolumeClaim:
+      claimName: shared-pvc

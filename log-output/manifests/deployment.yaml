@@ -14,5 +14,12 @@ spec:
     spec:
       containers:
       - name: log-output
-        image: your-dockerhub-username/log-output:latest
+        image: khushi03/log-output:latest
         imagePullPolicy: Always
+volumeMounts:
+  - name: shared
+    mountPath: /data
+volumes:
+  - name: shared
+    persistentVolumeClaim:
+      claimName: shared-pvc

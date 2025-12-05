@@ -1,14 +1,18 @@
 const express = require("express");
-const app = express();
+const fs = require("fs");
+const path = "/data/counter.txt";
 
 let counter = 0;
+try {
+  counter = parseInt(fs.readFileSync(path, "utf8")) || 0;
+} catch {}
+
+const app = express();
 
 app.get("/pingpong", (req, res) => {
-  res.send(`pong ${counter}`);
   counter++;
+  fs.writeFileSync(path, counter.toString());
+  res.send(`pong ${counter}`);
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Ping-Pong app started on port ${PORT}`);
-});
+app.listen(3000, () => console.log("Pingpong running"));
