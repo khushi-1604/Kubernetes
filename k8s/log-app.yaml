@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-app
+  labels:
+    app: log-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-app
+  template:
+    metadata:
+      labels:
+        app: log-app
+    spec:
+      containers:
+        - name: log-app
+          image: curlimages/curl
+          command: ["/bin/sh","-c"]
+          args:
+            - >
+              while true;
+              do
+                echo "Log app pinging greeter:";
+                curl -s http://greeter;
+                sleep 2;
+              done
