@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wikipedia-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wikipedia-app
+  template:
+    metadata:
+      labels:
+        app: wikipedia-app
+    spec:
+      volumes:
+        - name: html
+          emptyDir: {}
+
+      # -------------------
+      # INIT CONTAINER
+      # -------------------
+      initContainers:
+        - name: fetch-kubernetes-page
+          image: curlimages/curl
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Downloading Kubernetes page..."
+              curl -L https://en.wikipedia.org/wiki/Kubernetes -o /html/index.html
+          volumeMounts:
+            - name: html
+              mountPath: /html
+
+      # -------------------
+      # MAIN + SIDECAR
+      # -------------------
+      containers:
+
+        # ⬛ MAIN NGINX SERVER
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+
+        # 🔶 SIDECAR CONTAINER
+        - name: wikipedia-sidecar
+          image: curlimages/curl
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              while true; do
+                # sleep random 5–15 minutes (300–900 seconds)
+                S=$(( ( RANDOM % 600 ) + 300 ));
+                echo "Sidecar sleeping for $S seconds...";
+                sleep $S;
+
+                echo "Fetching random Wikipedia page..."
+                curl -L https://en.wikipedia.org/wiki/Special:Random \
+                  -o /html/random.html;
+
+                echo "Updated random.html at $(date)"
+              done
+          volumeMounts:
+            - name: html
+              mountPath: /html
