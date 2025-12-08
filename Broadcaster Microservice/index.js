@@ -7,6 +7,12 @@ const nats = await connect({
   servers: process.env.NATS_URL
 });
 
+if (process.env.MODE === "staging") {
+    console.log("STAGING MESSAGE:", message);
+    return; // Do not send to external service
+}
+
+
 console.log("Broadcaster connected to NATS");
 
 const sub = nats.subscribe("todo.events", {
